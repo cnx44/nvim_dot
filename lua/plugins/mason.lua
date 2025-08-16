@@ -35,6 +35,9 @@ return {
 
       -- Setup LSP per C/C++
       lspconfig.clangd.setup({})
+
+	   -- VHDL
+      lspconfig.vhdl_ls.setup({})
     end,
   },
 }

@@ -74,7 +74,6 @@ vim.opt.splitbelow = true                          -- Horizontal splits go below
 vim.opt.splitright = true                          -- Vertical splits go right
 
 -- Key mappings
-local isMacLayout = true 						   -- Use command insted of control as main modifier 
 vim.g.mapleader = " "                              -- Set leader key to spaces
 
 -- Center screen when jumping
@@ -82,19 +81,8 @@ vim.keymap.set("n", "n", "nzzzv", { desc = "Next search result (centered)" })
 vim.keymap.set("n", "N", "Nzzzv", { desc = "Previous search result (centered)" })
 
 -- Half screen jumps
-if isMacLayout then
-	vim.keymap.set("n", "<D-d>", "<C-d>zz", { desc = "Half page down (centered)" })
-	vim.keymap.set("n", "<D-u>", "<C-u>zz", { desc = "Half page up (centered)" })
-else
-	vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Half page down (centered)" })
-	vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Half page up (centered)" })
-end
-
--- Window navigation leader + h/j/k/l
-vim.keymap.set("n", "<leader>h", "<C-w>h", { desc = "Move to left window" })
-vim.keymap.set("n", "<leader>", "<C-w>j", { desc = "Move to bottom window" })
-vim.keymap.set("n", "<leader>l", "<C-w>k", { desc = "Move to top window" })
-vim.keymap.set("n", "<leader>l", "<C-w>l", { desc = "Move to right window" })
+vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Half page down (centered)" })
+vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Half page up (centered)" })
 
 -- Splitting & Resizing
 vim.keymap.set("n", "<leader>sv", ":vsplit<CR>", { desc = "Split window vertically" })
@@ -118,20 +106,40 @@ vim.keymap.set("v", ">", ">gv", { desc = "Indent right and reselect" })
 vim.keymap.set("n", "<leader>e", ":Explore<CR>", { desc = "Open file explorer" })
 vim.keymap.set("n", "<leader>ff", ":find ", { desc = "Find file" })
 
-
--- LSP Message pop up
+-- LSP Message pop up (toggle)
 local diag_win = nil
 
-vim.keymap.set("n", "<leader>d", function()
-  if diag_win and vim.api.nvim_win_is_valid(diag_win) then
-    vim.api.nvim_win_close(diag_win, true)
+local function is_floating(win)
+  local ok, cfg = pcall(vim.api.nvim_win_get_config, win)
+  return ok and cfg and cfg.relative ~= ""
+end
+
+vim.keymap.set("n", "<A-d>", function()
+  -- se c'è già e *è* una floating, chiudila
+  if diag_win and vim.api.nvim_win_is_valid(diag_win) and is_floating(diag_win) then
+    pcall(vim.api.nvim_win_close, diag_win, true)
     diag_win = nil
-  else
-    vim.diagnostic.open_float(nil, { focus = false })
-    local wins = vim.api.nvim_list_wins()
-    diag_win = wins[#wins]
+    return
   end
-end, { desc = "Toggle LSP diagnostic popup" })
+
+  -- apri il float e memorizza la nuova floating window
+  local before = vim.api.nvim_list_wins()
+  vim.diagnostic.open_float(nil, { focus = false })
+  local after = vim.api.nvim_list_wins()
+
+  -- trova la window nuova che è floating
+  diag_win = nil
+  for _, w in ipairs(after) do
+    local found = true
+    for _, b in ipairs(before) do
+      if w == b then found = false break end
+    end
+    if found and is_floating(w) then
+      diag_win = w
+      break
+    end
+  end
+end, { desc = "Toggle LSP diagnostic popup", noremap = true, silent = true })
 
 -- Lazy
 require("config.lazy")
