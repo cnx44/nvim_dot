@@ -13,7 +13,6 @@ return {
       " ██║╚██╗██║╚██╗ ██╔╝██║██║╚██╔╝██║",
       " ██║ ╚████║ ╚████╔╝ ██║██║ ╚═╝ ██║",
       " ╚═╝  ╚═══╝  ╚═══╝  ╚═╝╚═╝     ╚═╝",
-      "           neovim + lazy.nvim",
     }
 
     dashboard.section.buttons.val = {
@@ -23,7 +22,6 @@ return {
       dashboard.button("q", "  Quit", ":qa<CR>"),
     }
 
-    dashboard.section.footer.val = "󰚩  cnx@arch-server"
 
     alpha.setup(dashboard.opts)
   end,

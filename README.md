@@ -49,7 +49,7 @@ Currently set to **gruvbox**.
 ## Key Mappings
 
 ### Window Navigation
-- `<leader>h/j/k/l` → Move focus between splits
+- `C - h/j/k/l` → Move focus between splits
 - `<leader>sv` → Vertical split
 - `<leader>sh` → Horizontal split
 - `<leader><Up>/<Down>` → Increase/decrease height
